@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/jms http://www.springframework.org/schema/beans/spring-jms-2.5.xsd">
+
+    <!-- The IoHandler implementation -->
+    <!-- MO-ONLY connection handler -->
+    <bean id="moHandler" class="com.enorbus.sms.gw.cmpp.ClientHandler">
+        <property name="processor" ref="moProcessor"/>
+    </bean>
+
+    <!-- MO Session counter -->
+    <bean id="moSessionCounter" class="com.enorbus.sms.gw.cmpp.util.Counter"/>
+
+    <!-- MT Session counter -->
+    <bean id="mtSessionCounter" class="com.enorbus.sms.gw.cmpp.util.Counter"/>    
+
+    <!-- MT-ONLY connection handler -->
+    <bean id="mtHandler" class="com.enorbus.sms.gw.cmpp.ClientHandler">
+        <property name="processor" ref="mtProcessor"/>
+    </bean>
+
+    <!-- MO-ONLY connector processor -->
+    <bean id="moProcessor" class="com.enorbus.sms.gw.cmpp.processor.MoProcessorImpl">
+    	<property name="moMessageProducer" ref="moMessageProducer"/>
+    	<property name="messageDao" ref="messageDao"/>
+    </bean>
+
+    <!-- MT-ONLY connector processor -->
+    <bean id="mtProcessor" class="com.enorbus.sms.gw.cmpp.processor.MtProcessorImpl">
+    	<property name="messageDao" ref="messageDao"/>
+    </bean>
+
+    <!-- the IoFilters -->
+    <bean id="executorFilter" class="org.apache.mina.filter.executor.ExecutorFilter">
+        <constructor-arg>
+            <bean class="java.util.concurrent.Executors" factory-method="newCachedThreadPool"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="codecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+      <constructor-arg>
+        <bean class="com.enorbus.sms.gw.cmpp.codec.CmppProtocolCodecFactory" />
+      </constructor-arg>
+    </bean>
+
+    <bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" />
+    
+    <bean id="bytesLogFilter" class="com.enorbus.sms.gw.cmpp.filter.BytesLogFilter" />
+
+    <!-- The filter chain. -->
+    <bean id="filterChainBuilder" class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">
+      <property name="filters">
+        <map>
+          <entry key="bytesLogFilter" value-ref="bytesLogFilter"/>
+          <entry key="codecFilter" value-ref="codecFilter"/>
+          <entry key="loggingFilter" value-ref="loggingFilter"/>
+          <entry key="executor" value-ref="executorFilter"/>                        
+        </map>
+      </property>
+    </bean>
+
+    <!-- The MO-ONLY IoConnector -->
+    <bean id="moConnector" class="org.apache.mina.transport.socket.nio.NioSocketConnector" destroy-method="dispose" scope="prototype">
+        <property name="handler" ref="moHandler"/>
+        <property name="connectTimeoutMillis" value="10000"/>
+        <property name="filterChainBuilder" ref="filterChainBuilder"/>
+    </bean>
+
+    <!-- The MT-ONLY IoConnector -->
+    <bean id="mtConnector" class="org.apache.mina.transport.socket.nio.NioSocketConnector" destroy-method="dispose" scope="prototype">
+        <property name="handler" ref="mtHandler"/>
+        <property name="connectTimeoutMillis" value="10000"/>
+        <property name="filterChainBuilder" ref="filterChainBuilder"/>
+    </bean>
+
+    <bean id="cmppClient" class="com.enorbus.sms.gw.cmpp.CmppClient" destroy-method="stop">
+        <property name="moProcessor" ref="moProcessor"/>
+        <property name="mtProcessor" ref="mtProcessor"/>
+    </bean>
+
+    <!-- JMX stuff. Creates an MBeanServer. -->
+    <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+      <property name="locateExistingServerIfPossible" value="true"/>
+    </bean>
+
+    <bean name="HttpServer" class="com.enorbus.sms.gw.cmpp.servlet.HttpServer" init-method="start" destroy-method="close" />
+
+    <!-- RmiRegistryFactory -->
+	<bean id="registryRmiPort" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
+        <!--<property name="host" value="192.168.0.32"/>-->
+        <property name="port" value="1099"/>
+	</bean>
+
+    <bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean">
+        <property name="objectName" value="connector:name=rmi"/>
+        <property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:1099/myconnector"/>
+    </bean>
+
+    <!-- JMX stuff. Creates an MBeanServer. -->
+    <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+      <property name="beans">
+        <map>
+          <entry key="cmppgw:name=cmppClient">
+            <ref local="cmppClient"/>
+          </entry>
+          <entry key="cmppgw:name=moHandler">
+            <ref local="moHandler"/>
+          </entry>
+          <entry key="cmppgw:name=mtHandler">
+            <ref local="mtHandler"/>
+          </entry>
+        </map>
+      </property>
+      <property name="assembler">
+        <bean class="org.springframework.jmx.export.assembler.MethodNameBasedMBeanInfoAssembler">
+          <property name="managedMethods" value="shutdown,test"/>
+        </bean>
+      </property>
+      <property name="server">
+        <ref local="mbeanServer"/>
+      </property>
+    </bean>
+    
+    <!-- JMS definitions -->	
+	<bean id="moQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>MOQueue</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="mtQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>MTQueue</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <property name="targetConnectionFactory">
+     		<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL">
+					<value>tcp://192.168.1.102:61616</value>
+				</property>
+			</bean>
+        </property>
+    </bean>
+    
+    <!-- Custom Message Converter -->
+    <bean id="moMessageConverter" class="com.enorbus.sms.gw.cmpp.mq.converter.MoMessageConverter"/>
+    
+    <bean id="mtMessageConverter" class="org.springframework.jms.support.converter.SimpleMessageConverter"/>
+    
+   	<bean id="moJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="defaultDestinationName" value="moQueue"/>
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="messageConverter" ref="moMessageConverter"/>
+	</bean>
+	
+	<bean id="moMessageProducer" class="com.enorbus.sms.gw.cmpp.mq.MoMessageProducer">
+		<property name="jmsTemplate" ref="moJmsTemplate"/>
+		<property name="queue" ref="moQueue"/>
+	</bean>
+	
+	<!--  Message Driven POJO (MDP) -->
+	<bean id="mtMessageListener" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+		<constructor-arg>
+			<bean class="com.enorbus.sms.gw.cmpp.mq.MtMessgageConsumer">
+			</bean>
+		</constructor-arg>
+		<!--<property name="defaultListenerMethod" value="sendEmail"/>
+		--><!-- custom MessageConverter define -->
+		<property name="messageConverter" ref="mtMessageConverter"/>
+	</bean>
+	
+	<!-- Spring MDB Setting -->
+	<bean id="mtListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory"/>
+		<property name="destinationName" value="mtQueue"/>
+		<property name="messageListener" ref="mtMessageListener"/>
+		<property name="concurrentConsumers" value="5"/>
+	</bean>
+</beans>

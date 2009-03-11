@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+        PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MessageSQL"> 
+    
+    <insert id="saveMo" parameterClass="com.enorbus.sms.gw.cmpp.message.DeliverMessage">
+        insert into t_mo_log
+		  (MSG_ID, 
+		  DEST_ID, 
+		  SERVICE_ID, 
+		  TP_PID, 
+		  TP_UDHI, 
+		  MSG_FMT, 
+		  SRC_TERMINAL_ID, 
+		  SRC_TERMINAL_TYPE, 
+		  MSG_LENGTH, 
+		  MSG_CONTENT, 
+		  LINKID, 
+		  SPID)
+		values(
+		   #msgIdStr#,
+		   #destId#,		   
+		   #serviceId#,
+		   #tpPid#,
+		   #tpUdhi#,		
+    	   #msgFmt#,
+		   #srcTerminalId#,
+		   #srcTerminalType#,
+		   #msgLength#,		   
+		   #msgContent#,
+		   #linkId#,
+		   #spId#)
+    </insert>
+    
+     <insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.mq.MtLogMessage">
+       insert into t_mt_log
+  		(msgid, 
+  		columnid, 
+  		servicecode, 
+  		feetype, 
+  		itemfee, 
+  		monthfee, 
+  		firstmomt, 
+  		chargewho, 
+  		feenumber, 
+  		fromnumber, 
+  		tonumber, 
+  		msgfmt, 
+  		tp_pid, 
+  		tp_udhi, 
+  		isreply, 
+  		content, 
+  		regdate, 
+  		atdate, 
+  		validdate, 
+  		comefrom, 
+  		linkid, 
+  		oid, 
+  		ptmonth, 
+  		gwid, 
+  		gwdate, 
+  		gwstatus, 
+  		rptstatusstr, 
+  		rptdate, 
+  		momsgid)
+		select
+		   #msgIdStr#,
+		   #columnId#,
+		   #serviceId#,
+		   #feeType#,
+		   #itemFee#,
+		   #monthFee#,
+		   #firstMoMt#,
+		   #chargeWho#,
+		   #feeTerminalId#,
+		   #srcId#,
+		   #destTerminalId#,
+		   #msgFmt#,
+		   #tpPid#,
+		   #tpUdhi#,
+		   #isPlay#,
+		   #fullContent#,
+		   #regDate#,
+		   #atTimeTs#,
+		   #validTimeTs#,
+		   #comeFrom#,
+		   #linkId#,
+		   oid,
+		   to_number(to_char(#regDate#, 'mm')),
+		   #gwId#,
+		   #gwDate#,
+		   #gwStatus#,
+		   #rptStatussir#,
+		   #rptDate#,
+		   #moMsgId#
+		   from t_numseg where numseg=substr(#destTerminalId#, 1, 7)
+    </insert>
+    
+    <update id="updateMt" parameterClass="java.util.Map" >
+      update t_mt_log
+   		set 
+       	rptstatusstr = #rptStatussir#,
+       	rptdate = #rptDate#
+ 		where msgid = #msgIdStr# and tonumber = #toNumber#
+    </update>
+</sqlMap>

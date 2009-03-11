@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+    <settings
+            cacheModelsEnabled="true"
+            enhancementEnabled="true"
+            lazyLoadingEnabled="true"
+            errorTracingEnabled="true"
+            maxTransactions="5"
+            maxRequests="32"
+            maxSessions="10"
+            useStatementNamespaces="false"/>
+
+    <!-- Identify all SQL Map XML files to be loaded by this SQL map. Relative to classpath -->
+    <sqlMap resource="sqlmaps/MessageSQL.xml"/>
+</sqlMapConfig>

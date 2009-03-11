@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <ismgHost>127.0.0.1</ismgHost>
+    <ismgPort>7890</ismgPort>
+    <spId>909159</spId>
+    <sharedSecret>123456</sharedSecret>
+
+    <!-- MT连接数 -->
+    <mtConnectionNumber>1</mtConnectionNumber>
+
+    <!-- MO连接数 -->
+    <moConnectionNumber>1</moConnectionNumber>
+
+    <msgIdReverse>true</msgIdReverse>
+
+    <!-- 是否支持长短信协议，若不支持，则分割为多条进行发送 -->
+    <supportLongMsgProtocol>false</supportLongMsgProtocol>
+
+    <!-- 链路测试间隔，产品环境中设置为10 -->
+    <activeTestInterval>100</activeTestInterval>
+    <!-- 链路测试超时时间 -->
+    <activeTestTimeout>60</activeTestTimeout>
+    <!-- 链路测试失败最大重试次数 -->
+    <activeTestMaxRetry>3</activeTestMaxRetry>
+
+    <!-- 消息发送超时时间 -->
+    <transportTimeout>60</transportTimeout>
+    <!-- 消息发送失败最大重试次数 -->
+    <transportMaxRetry>3</transportMaxRetry>
+
+    <!--滑动窗口大小（流量控制）-->
+    <trafficControl>16</trafficControl>
+    
+    <!-- 查询状态超时时间 -->
+    <queryTimeout>10</queryTimeout>
+</config>
