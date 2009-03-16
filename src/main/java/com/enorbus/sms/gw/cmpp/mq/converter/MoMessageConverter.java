@@ -73,7 +73,6 @@ public class MoMessageConverter implements MessageConverter {
 			msg.setString("MSG_CONTENT", pojo.getMsgContent());
 			msg.setString("LINKID", pojo.getLinkId());
 			msg.setStringProperty("SPID", Config.getInstance().getSpId());
-			
 			return msg;
 		} else {
 			String err = "Object:[" + obj + "] is not DeliverMessage";

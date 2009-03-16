@@ -5,35 +5,15 @@
 <sqlMap namespace="MessageSQL"> 
     
     <insert id="saveMo" parameterClass="com.enorbus.sms.gw.cmpp.message.DeliverMessage">
-        insert into t_mo_log
-		  (MSG_ID, 
-		  DEST_ID, 
-		  SERVICE_ID, 
-		  TP_PID, 
-		  TP_UDHI, 
-		  MSG_FMT, 
-		  SRC_TERMINAL_ID, 
-		  SRC_TERMINAL_TYPE, 
-		  MSG_LENGTH, 
-		  MSG_CONTENT, 
-		  LINKID, 
-		  SPID)
-		values(
-		   #msgIdStr#,
-		   #destId#,		   
-		   #serviceId#,
-		   #tpPid#,
-		   #tpUdhi#,		
-    	   #msgFmt#,
-		   #srcTerminalId#,
-		   #srcTerminalType#,
-		   #msgLength#,		   
-		   #msgContent#,
-		   #linkId#,
-		   #spId#)
+        INSERT INTO T_MO_LOG(MSG_ID, DEST_ID, SERVICE_ID, TP_PID, TP_UDHI, 
+        	MSG_FMT, SRC_TERMINAL_ID, SRC_TERMINAL_TYPE, MSG_LENGTH, 
+        	MSG_CONTENT, LINKID, SPID)
+		VALUES(#msgIdStr#, #destId#, #serviceId#, #tpPid#, #tpUdhi#, #msgFmt#,
+		   #srcTerminalId#, #srcTerminalType#, #msgLength#, #msgContent#,
+		   #linkId#, #spId#)
     </insert>
     
-     <insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.mq.MtLogMessage">
+	<insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.mq.MtLogMessage">
        insert into t_mt_log
   		(msgid, 
   		columnid, 
@@ -104,4 +84,24 @@
        	rptdate = #rptDate#
  		where msgid = #msgIdStr# and tonumber = #toNumber#
     </update>
+    
+    <typeAlias alias="service" type="com.enorbus.sms.gw.cmpp.domain.Service"/>
+    
+    <resultMap class="service" id="serviceResult">
+    	<result property="id" column="ID"/>
+    	<result property="serviceCode" column="SERVICE_CODE"/>
+    	<result property="feeType" column="FEE_TYPE"/>
+    	<result property="feeCode" column="FEE_CODE"/>
+    	<result property="provider.id" column="PROVIDER_ID"/>
+    	<result property="provider.spId" column="SPID"/>
+    	<result property="provider.serviceNumber" column="SERVICE_NUMBER"/>
+    	<result property="provider.type" column="TYPE"/>
+    </resultMap>
+    
+    <select id="getService" parameterClass="java.util.Map" resultMap="serviceResult">
+    	SELECT * FROM T_SERVICE S JOIN T_PROVIDER P
+    	ON S.PROVIDER_ID = P.ID
+    	WHERE SERVICE_CODE = #serviceCode#
+    	AND SPID = #spId#
+    </select>
 </sqlMap>

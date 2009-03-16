@@ -40,6 +40,7 @@ public abstract class RequestThread extends Thread {
 	        try {
 				Thread.sleep(timeout*1000);
 			} catch (InterruptedException e) {
+				System.out.println("interrupt sleep: " + e.getMessage());
 			}
 		}
 		synchronized (this.stop) {
@@ -56,6 +57,7 @@ public abstract class RequestThread extends Thread {
 	 */
 	public boolean respReceived() {
         synchronized (this.stop) {
+        	System.out.println("call respReceived");
 			if (!stop) {
 				this.stop = true;
 		        interrupt();

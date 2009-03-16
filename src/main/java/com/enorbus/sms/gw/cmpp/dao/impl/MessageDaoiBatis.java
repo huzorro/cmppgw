@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 import com.enorbus.sms.gw.cmpp.dao.MessageDao;
+import com.enorbus.sms.gw.cmpp.domain.Service;
 import com.enorbus.sms.gw.cmpp.message.DeliverMessage;
 import com.enorbus.sms.gw.cmpp.message.SubmitMessage;
 
@@ -32,5 +33,10 @@ public class MessageDaoiBatis extends SqlMapClientDaoSupport implements MessageD
 			}
 			updateFaileVaule=getSqlMapClientTemplate().update("updateMt", map);
 		}		
+	}
+
+	@Override
+	public Service getService(Map parameterMap) {
+		return (Service) getSqlMapClientTemplate().queryForObject("getService", parameterMap);
 	}
 }

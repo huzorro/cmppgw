@@ -1,7 +1,5 @@
 package com.enorbus.sms.gw.cmpp.message;
 
-import java.sql.Timestamp;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -12,13 +10,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @version $Id: SubmitMessage.java 2129 2009-02-18 09:29:28Z jinxue.liu $
  */
 public class SubmitMessage extends AbstractMessage {
-    /**
+	private static final long serialVersionUID = -1646668733251643223L;
+
+	/**
      * 信息标识
      * 8	Unsigned Integer
      */
     private long msgId;
-    
-    
 
     /**
      * 相同Msg_Id的信息总条数，从1开始。
@@ -64,7 +62,7 @@ public class SubmitMessage extends AbstractMessage {
      * 被计费用户的号码，当Fee_UserType为3时该值有效，当Fee_UserType为0、1、2时该值无意义。
      * 32	Octet String
      */
-    private String feeTerminalId;
+    private String feeTerminalId = "";
 
     /**
      * 被计费用户的号码类型，0：真实号码；1：伪码。
@@ -94,7 +92,7 @@ public class SubmitMessage extends AbstractMessage {
      * 信息内容来源(SP_Id)
      * 6	Octet String
      */
-    private String msgSrc;
+    private String msgSrc = new String(new byte[6]);
 
     /**
      * 资费类别：
@@ -103,35 +101,33 @@ public class SubmitMessage extends AbstractMessage {
      * 03：对“计费用户号码”按包月收取信息费。
      * 2	Octet String
      */
-    private String feeType;
+    private String feeType = new String(new byte[2]);
 
     /**
      * 资费（以分为单位）。
      * 6	Octet String
      */
-    private String feeCode;
+    private String feeCode = new String(new byte[6]);
 
     /**
      * 存活有效期，格式遵循SMPP3.3协议。
      * 17	Octet String
      */
-    private String validTime;
+    private String validTime = new String(new byte[17]);
 
     /**
      * 定时发送时间，格式遵循SMPP3.3协议。
      * 17	Octet String
      */
-    private String atTime;
+    private String atTime = new String(new byte[17]);
     
-    
-
     /**
      * 源号码。SP的服务代码或前缀为服务代码的长号码,
      * 网关将该号码完整的填到SMPP协议Submit_SM消息相应的source_addr字段，
      * 该号码最终在用户手机上显示为短消息的主叫号码。
      * 21	Octet String
      */
-    private String srcId;
+    private String srcId = new String(new byte[21]);
 
     /**
      * 接收信息的用户数量(小于100个用户)。
@@ -163,20 +159,17 @@ public class SubmitMessage extends AbstractMessage {
      */
     private byte [] msgContent;
 
-
-
 	/**
      * 点播业务使用的LinkID，非点播类业务的MT流程不使用该字段。
      * 20	Octet String
      */
+    private String linkId = new String(new byte[20]);
     
-    private String linkId;
-    /**
-     * MtLog
-     * 
-     */
-    	
-  
+    /** 与此MT关联的MO的msgid */
+    private String moMsgId;
+    
+    /** 完整的短信内容 */
+    private String fullMsgContent;
 	
 	public byte[] getMsgContent() {
 		return msgContent;
@@ -362,8 +355,6 @@ public class SubmitMessage extends AbstractMessage {
         this.msgLength = msgLength;
     }
 
-    
-
     public String getLinkId() {
         return linkId;
     }
@@ -372,7 +363,23 @@ public class SubmitMessage extends AbstractMessage {
         this.linkId = linkId;
     }
 
-    public String toString() {
+    public void setMoMsgId(String moMsgId) {
+		this.moMsgId = moMsgId;
+	}
+
+	public String getMoMsgId() {
+		return moMsgId;
+	}
+
+	public void setFullMsgContent(String fullMsgContent) {
+		this.fullMsgContent = fullMsgContent;
+	}
+
+	public String getFullMsgContent() {
+		return fullMsgContent;
+	}
+
+	public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
 }
