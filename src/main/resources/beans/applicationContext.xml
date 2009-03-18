@@ -153,7 +153,7 @@
     <bean id="mtMessageConverter" class="org.springframework.jms.support.converter.SimpleMessageConverter"/>
     
    	<bean id="moJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<property name="defaultDestinationName" value="moQueue"/>
+		<property name="defaultDestinationName" value="MOQueue"/>
 		<property name="connectionFactory" ref="connectionFactory"/>
 		<property name="messageConverter" ref="moMessageConverter"/>
 	</bean>
@@ -184,7 +184,7 @@
 	<!-- Spring MDB Setting -->
 	<bean id="mtListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory"/>
-		<property name="destinationName" value="mtQueue"/>
+		<property name="destinationName" value="MTQueue"/>
 		<property name="messageListener" ref="mtMessageListener"/>
 		<property name="concurrentConsumers" value="5"/>
 	</bean>

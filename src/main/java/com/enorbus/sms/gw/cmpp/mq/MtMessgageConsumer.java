@@ -61,7 +61,7 @@ public class MtMessgageConsumer {
 			logger.error(errMsg);
 			throw new NullPointerException(errMsg);
 		}
-		String fullMsgContent = (String) msg.get("MSG_CONTENT");
+		String msgContent = (String) msg.get("MSG_CONTENT");
 		
 		List<byte[]> msgList;
 		
@@ -75,14 +75,14 @@ public class MtMessgageConsumer {
 				|| msgFmt == MessageConst.MSGFMT_GB) {
 			if (config.isSupportLongMsgProtocol()) {
 				// 直接作为一条长短信发送到用户手机
-				msgList = LongMessageUtil.splitLongMsg(fullMsgContent, msgFmt);
+				msgList = LongMessageUtil.splitLongMsg(msgContent, msgFmt);
 			} else {
 				// 分割长短信为多条发送到用户手机
-				msgList = LongMessageUtil.splitSimpleMsg(fullMsgContent, msgFmt);
+				msgList = LongMessageUtil.splitSimpleMsg(msgContent, msgFmt);
 			}
 		} else if (msgFmt == MessageConst.MSGFMT_BIN) {
 			// 目前二进制信息只支持WAP PUSH
-			String pushContent[] = fullMsgContent.split(",", 2);
+			String pushContent[] = msgContent.split(",", 2);
 			msgList = WapPushEncode.instance.encodePush(pushContent[0],
 					pushContent[1]);
 		} else {
@@ -99,6 +99,8 @@ public class MtMessgageConsumer {
 		}
 		int destUsrTl = msg.get("DEST_TERMINAL_ID").toString().split(
 				Constants.TERMINAL_ID_SPLITTER).length;		
+		String destTerminalId = (String) msg.get("DEST_TERMINAL_ID");
+		
 		Object msgLevel = msg.get("MSG_LEVEL");		
 		Object serviceId = msg.get("SERVICE_ID");
 		if (serviceId == null) {
@@ -130,13 +132,6 @@ public class MtMessgageConsumer {
 			srcId = (String) msg.get("SRC_ID");
 		} else srcId = service.getProvider().getServiceNumber();
 
-		if (msg.get("DEST_TERMINAL_ID") == null) {
-			errMsg = "DEST_TERMINAL_ID can not be null";
-			logger.error(errMsg);
-			throw new NullPointerException(errMsg);	
-		}
-		String destTerminalId = (String) msg.get("DEST_TERMINAL_ID");
-		
 		Object linkId = msg.get("LINKID");
 		Object moMsgId = msg.get("MO_MSG_ID");
 		
@@ -210,7 +205,7 @@ public class MtMessgageConsumer {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyMMddhhmmss");
 			Calendar validTime = Calendar.getInstance();
 			validTime.add(Calendar.DAY_OF_MONTH, 1);
-			sm.setValidTime(sdf.format(validTime.getTime()) + "032+"); 
+			sm.setValidTime(sdf.format(validTime.getTime()) + "032+");
 
 			// 设置定时时间，时间格式: YYMMDDhhmmsstnnp 
 			if (atTime != null) {
@@ -225,9 +220,9 @@ public class MtMessgageConsumer {
 			sm.setMsgContent(singleMsgContent); // 网关内容
 			if (config.isSupportLongMsgProtocol()
 					|| msgFmt == MessageConst.MSGFMT_BIN) {
-				sm.setFullMsgContent(fullMsgContent); // 记录完整内容
+				sm.setMsgContentStr(msgContent); // 记录完整内容
 			} else {
-				sm.setFullMsgContent(new String(singleMsgContent)); // 记录分割后的内容
+				sm.setMsgContentStr(new String(singleMsgContent)); // 记录分割后的内容
 			}
 
 			if (linkId != null) {

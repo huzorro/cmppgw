@@ -13,76 +13,25 @@
 		   #linkId#, #spId#)
     </insert>
     
-	<insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.mq.MtLogMessage">
-       insert into t_mt_log
-  		(msgid, 
-  		columnid, 
-  		servicecode, 
-  		feetype, 
-  		itemfee, 
-  		monthfee, 
-  		firstmomt, 
-  		chargewho, 
-  		feenumber, 
-  		fromnumber, 
-  		tonumber, 
-  		msgfmt, 
-  		tp_pid, 
-  		tp_udhi, 
-  		isreply, 
-  		content, 
-  		regdate, 
-  		atdate, 
-  		validdate, 
-  		comefrom, 
-  		linkid, 
-  		oid, 
-  		ptmonth, 
-  		gwid, 
-  		gwdate, 
-  		gwstatus, 
-  		rptstatusstr, 
-  		rptdate, 
-  		momsgid)
-		select
-		   #msgIdStr#,
-		   #columnId#,
-		   #serviceId#,
-		   #feeType#,
-		   #itemFee#,
-		   #monthFee#,
-		   #firstMoMt#,
-		   #chargeWho#,
-		   #feeTerminalId#,
-		   #srcId#,
-		   #destTerminalId#,
-		   #msgFmt#,
-		   #tpPid#,
-		   #tpUdhi#,
-		   #isPlay#,
-		   #fullContent#,
-		   #regDate#,
-		   #atTimeTs#,
-		   #validTimeTs#,
-		   #comeFrom#,
-		   #linkId#,
-		   oid,
-		   to_number(to_char(#regDate#, 'mm')),
-		   #gwId#,
-		   #gwDate#,
-		   #gwStatus#,
-		   #rptStatussir#,
-		   #rptDate#,
-		   #moMsgId#
-		   from t_numseg where numseg=substr(#destTerminalId#, 1, 7)
+	<insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.message.SubmitMessage">
+       	INSERT INTO T_MT_LOG(MSG_ID, REGISTERED_DELIVERY, MSG_LEVEL, SERVICE_ID,
+       		FEE_USER_TYPE, FEE_TERMINAL_ID, FEE_TERMINAL_TYPE, TP_PID, TP_UDHI,
+       		MSG_FMT, MSG_SRC, FEETYPE, FEECODE, VALID_TIME, AT_TIME, SRC_ID, 
+       		DESTUSR_TL, DEST_TERMINAL_ID, DEST_TERMINAL_TYPE, MSG_LENGTH, 
+       		LINKID, STAT, SUBMIT_TIME, DONE_TIME, MO_MSG_ID)
+       	VALUES(#msgIdStr#, #registeredDelivery#, #msgLevel#, #serviceId#,
+       		#feeUserType#, #feeTerminalId#, #tpPid#, #tpUdhi#, #msgFmt#, 
+       		#msgSrc#, #feeType#, #feeCode#, #validTime#, #atTime#, #srcId#,
+       		#destUsrTl#, #destTerminal#, #destTerminalType#, #msgLength#,
+       		#linkId#, #stat#, #submitTime#, #doneTime#, #moMsgId#)
     </insert>
     
     <update id="updateMt" parameterClass="java.util.Map" >
-      update t_mt_log
-   		set 
-       	rptstatusstr = #rptStatussir#,
-       	rptdate = #rptDate#
- 		where msgid = #msgIdStr# and tonumber = #toNumber#
+      UPDATE T_MT_LOG SET 
+      	STAT = #stat#, 
+      	SUBMIT_TIME = #submitTime#, 
+      	DONE_TIME = #doneTime# 
+      	WHERE MSG_ID = #msgIdStr# AND DEST_TERMINAL_ID = #destTerminalId#
     </update>
     
     <typeAlias alias="service" type="com.enorbus.sms.gw.cmpp.domain.Service"/>
@@ -90,8 +39,8 @@
     <resultMap class="service" id="serviceResult">
     	<result property="id" column="ID"/>
     	<result property="serviceCode" column="SERVICE_CODE"/>
-    	<result property="feeType" column="FEE_TYPE"/>
-    	<result property="feeCode" column="FEE_CODE"/>
+    	<result property="feeType" column="FEETYPE"/>
+    	<result property="feeCode" column="FEECODE"/>
     	<result property="provider.id" column="PROVIDER_ID"/>
     	<result property="provider.spId" column="SPID"/>
     	<result property="provider.serviceNumber" column="SERVICE_NUMBER"/>

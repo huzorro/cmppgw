@@ -18,6 +18,7 @@ import com.enorbus.sms.gw.cmpp.handler.QueryRequest;
 import com.enorbus.sms.gw.cmpp.message.ActiveTestRespMessage;
 import com.enorbus.sms.gw.cmpp.message.CancelRespMessage;
 import com.enorbus.sms.gw.cmpp.message.QueryRespMessage;
+import com.enorbus.sms.gw.cmpp.message.SubmitMessage;
 import com.enorbus.sms.gw.cmpp.message.SubmitRespMessage;
 import com.enorbus.sms.gw.cmpp.mq.MtLogMessage;
 import com.enorbus.sms.gw.cmpp.task.SubmitTask;
@@ -103,14 +104,9 @@ public class MtProcessorImpl extends AbstractPocessor {
         if (task != null) {
             task.respReceived();
             //取出信息
-            final MtLogMessage msg = (MtLogMessage) task.getMsg();
+            final SubmitMessage msg = (MtLogMessage) task.getMsg();
 
             msg.setMsgIdStr(((SubmitRespMessage)message).getMsgIdStr());		//网关自动产生的msid
-            msg.setStatus(((SubmitRespMessage) message).getResult());	//移动网关返回结果
-            msg.setRptStatussir("");	//状态报告返回的结果
-            msg.setRptDate(null);
-            Date submitDate = new Date();   //网关时间
-            msg.setGwDate(new Timestamp(submitDate.getTime()));
 
             if (msg.getPkTotal() == msg.getPkNumber()) {
                 String[] toNumber = msg.getDestTerminalId().split(Constants.TERMINAL_ID_SPLITTER);

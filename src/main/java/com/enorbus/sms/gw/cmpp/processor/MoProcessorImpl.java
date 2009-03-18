@@ -114,36 +114,20 @@ public class MoProcessorImpl extends AbstractPocessor {
 
     public void onStatusReport(IoSession session, Object message) {
         //状态报告
+    	StatusReportMessage drm = (StatusReportMessage) message;
         DeliverResponse deliverResp = new DeliverResponse(session, ((StatusReportMessage)message).getHeader().getSequenceId(),
-                ((StatusReportMessage)message).getMsgId(), 0);
+                drm.getMsgId(), 0);
         deliverResp.start();
 
-        //取当前的时间
-        //Date statusDate = new Date();
-        //SimpleDateFormat df=new SimpleDateFormat("yyMMddhhmmss");
-        //String doneTime=df.format(statusDate).substring(0, 2)+((StatusReportMessage)message).getDoneTime();
-
-        SimpleDateFormat df=new SimpleDateFormat("yyMMddhhmm");
-        String doneTime=((StatusReportMessage)message).getDoneTime();
-
-        String status=((StatusReportMessage)message).getStat();			//修改状态
-        String msgId = ((StatusReportMessage)message).getMsgIdStr();	//msgid
-        String toNumber = ((StatusReportMessage)message).getDestTerminalId();	//目的手机号
-        Timestamp rptDate = null;
-        try {
-            rptDate = new Timestamp(df.parse(doneTime).getTime());		//状态报告返回日期
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Map<String, Object> updateMap = new HashMap<String, Object>();
-        updateMap.put("msgIdStr", msgId);
-        updateMap.put("rptStatussir", status);
-        updateMap.put("rptDate", rptDate);
-        updateMap.put("toNumber", toNumber);
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        parameterMap.put("msgIdStr", drm.getMsgIdStr());
+        parameterMap.put("stat", drm.getStat());
+        parameterMap.put("submitTime", drm.getSubmitTime());
+        parameterMap.put("doneTime", drm.getDoneTime());
+        parameterMap.put("destTerminalId", drm.getDestTerminalId());
 
         // 更新MT状态字段
-        messageDao.updateMt(updateMap);
+        messageDao.updateMt(parameterMap);
         
         // TODO 发布状态报告主题以通知订阅者
         

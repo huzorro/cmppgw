@@ -1,5 +1,7 @@
 package com.enorbus.sms.gw.cmpp.message;
 
+import java.util.Date;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -157,7 +159,7 @@ public class SubmitMessage extends AbstractMessage {
      * 信息内容。
      * Msg_length	Octet String
      */
-    private byte [] msgContent;
+    private byte[] msgContent;
 
 	/**
      * 点播业务使用的LinkID，非点播类业务的MT流程不使用该字段。
@@ -168,8 +170,20 @@ public class SubmitMessage extends AbstractMessage {
     /** 与此MT关联的MO的msgid */
     private String moMsgId;
     
+    /** 提交时间 */
+    private Date submitTime;
+    
+    /** 下发时间 */
+    private Date doneTime;
+    
+    /** 下发状态码 */
+    private String stat;
+    
     /** 完整的短信内容 */
-    private String fullMsgContent;
+    private String msgContentStr;
+    
+    /** MSGID的字符串表示 */
+    private String msgIdStr;
 	
 	public byte[] getMsgContent() {
 		return msgContent;
@@ -371,12 +385,44 @@ public class SubmitMessage extends AbstractMessage {
 		return moMsgId;
 	}
 
-	public void setFullMsgContent(String fullMsgContent) {
-		this.fullMsgContent = fullMsgContent;
+	public void setMsgContentStr(String msgContentStr) {
+		this.msgContentStr = msgContentStr;
 	}
 
-	public String getFullMsgContent() {
-		return fullMsgContent;
+	public String getMsgContentStr() {
+		return msgContentStr;
+	}
+
+	public Date getSubmitTime() {
+		return submitTime;
+	}
+
+	public void setSubmitTime(Date submitTime) {
+		this.submitTime = submitTime;
+	}
+
+	public Date getDoneTime() {
+		return doneTime;
+	}
+
+	public void setDoneTime(Date doneTime) {
+		this.doneTime = doneTime;
+	}
+
+	public String getStat() {
+		return stat;
+	}
+
+	public void setStat(String stat) {
+		this.stat = stat;
+	}
+
+	public void setMsgIdStr(String msgIdStr) {
+		this.msgIdStr = msgIdStr;
+	}
+
+	public String getMsgIdStr() {
+		return msgIdStr;
 	}
 
 	public String toString() {
