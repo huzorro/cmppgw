@@ -15,18 +15,19 @@
     
 	<insert id="saveMt" parameterClass="com.enorbus.sms.gw.cmpp.message.SubmitMessage">
        	INSERT INTO T_MT_LOG(MSG_ID, REGISTERED_DELIVERY, MSG_LEVEL, SERVICE_ID,
-       		FEE_USER_TYPE, FEE_TERMINAL_ID, FEE_TERMINAL_TYPE, TP_PID, TP_UDHI,
+       		FEE_USERTYPE, FEE_TERMINAL_ID, FEE_TERMINAL_TYPE, TP_PID, TP_UDHI,
        		MSG_FMT, MSG_SRC, FEETYPE, FEECODE, VALID_TIME, AT_TIME, SRC_ID, 
        		DESTUSR_TL, DEST_TERMINAL_ID, DEST_TERMINAL_TYPE, MSG_LENGTH, 
-       		LINKID, STAT, SUBMIT_TIME, DONE_TIME, MO_MSG_ID)
+       		MSG_CONTENT, LINKID, STAT, SUBMIT_TIME, DONE_TIME, MO_MSG_ID)
        	VALUES(#msgIdStr#, #registeredDelivery#, #msgLevel#, #serviceId#,
-       		#feeUserType#, #feeTerminalId#, #tpPid#, #tpUdhi#, #msgFmt#, 
-       		#msgSrc#, #feeType#, #feeCode#, #validTime#, #atTime#, #srcId#,
-       		#destUsrTl#, #destTerminal#, #destTerminalType#, #msgLength#,
-       		#linkId#, #stat#, #submitTime#, #doneTime#, #moMsgId#)
+       		#feeUserType#, #feeTerminalId#, #feeTerminalType#, #tpPid#, 
+       		#tpUdhi#, #msgFmt#, #msgSrc#, #feeType#, #feeCode#, #validTime#, 
+       		#atTime#, #srcId#, #destUsrTl#, #destTerminalId#, 
+       		#destTerminalType#, #msgLength#, #msgContentStr#, #linkId#, #stat#, 
+       		#submitTime#, #doneTime#, #moMsgId#)
     </insert>
     
-    <update id="updateMt" parameterClass="java.util.Map" >
+    <update id="updateMt" parameterClass="java.util.Map">
       UPDATE T_MT_LOG SET 
       	STAT = #stat#, 
       	SUBMIT_TIME = #submitTime#, 

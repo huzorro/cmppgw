@@ -153,7 +153,8 @@
     <bean id="mtMessageConverter" class="org.springframework.jms.support.converter.SimpleMessageConverter"/>
     
    	<bean id="moJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<property name="defaultDestinationName" value="MOQueue"/>
+		<!--property name="defaultDestinationName" value="MOQueue"/-->
+		<property name="defaultDestination" ref="moQueue"/>
 		<property name="connectionFactory" ref="connectionFactory"/>
 		<property name="messageConverter" ref="moMessageConverter"/>
 	</bean>
@@ -163,17 +164,21 @@
 		<property name="queue" ref="moQueue"/>
 	</bean>
 	
-	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	<!--bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="5" />
 		<property name="maxPoolSize" value="10" />
 		<property name="queueCapacity" value="25" />
+	</bean-->
+	
+	<bean id="senderThreadPool" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool">
+		<constructor-arg value="20"/>
 	</bean>	
 	
 	<!--  Message Driven POJO (MDP) -->
 	<bean id="mtMessageListener" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
 		<constructor-arg>
 			<bean class="com.enorbus.sms.gw.cmpp.mq.MtMessgageConsumer">
-				<property name="taskExecutor" ref="taskExecutor"/>
+				<property name="threadPool" ref="senderThreadPool"/>
 				<property name="messageDao" ref="messageDao"/>
 			</bean>
 		</constructor-arg>
@@ -184,7 +189,8 @@
 	<!-- Spring MDB Setting -->
 	<bean id="mtListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory"/>
-		<property name="destinationName" value="MTQueue"/>
+		<!-- property name="destinationName" value="MTQueue"/-->
+		<property name="destination" ref="mtQueue"/>
 		<property name="messageListener" ref="mtMessageListener"/>
 		<property name="concurrentConsumers" value="5"/>
 	</bean>

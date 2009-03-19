@@ -1,8 +1,6 @@
 package com.enorbus.sms.gw.cmpp.processor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
-import java.util.Date;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -104,7 +102,7 @@ public class MtProcessorImpl extends AbstractPocessor {
         if (task != null) {
             task.respReceived();
             //取出信息
-            final SubmitMessage msg = (MtLogMessage) task.getMsg();
+            final SubmitMessage msg = task.getMsg();
 
             msg.setMsgIdStr(((SubmitRespMessage)message).getMsgIdStr());		//网关自动产生的msid
 
@@ -124,7 +122,7 @@ public class MtProcessorImpl extends AbstractPocessor {
             		
             		msg.setDestTerminalId(toNumber[i]);
 	                try {
-						messageDao.saveMt((MtLogMessage)BeanUtils.cloneBean(msg));
+						messageDao.saveMt((SubmitMessage)BeanUtils.cloneBean(msg));
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					} catch (InstantiationException e) {

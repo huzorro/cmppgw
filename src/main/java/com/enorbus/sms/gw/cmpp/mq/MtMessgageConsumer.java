@@ -6,40 +6,42 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.task.TaskExecutor;
 
 import com.enorbus.sms.gw.cmpp.Constants;
+import com.enorbus.sms.gw.cmpp.SessionManager;
 import com.enorbus.sms.gw.cmpp.dao.MessageDao;
 import com.enorbus.sms.gw.cmpp.domain.Service;
 import com.enorbus.sms.gw.cmpp.message.MessageHeader;
 import com.enorbus.sms.gw.cmpp.message.SubmitMessage;
 import com.enorbus.sms.gw.cmpp.support.Config;
 import com.enorbus.sms.gw.cmpp.support.SeqGenerator;
+import com.enorbus.sms.gw.cmpp.task.SubmitTask;
 import com.enorbus.sms.gw.cmpp.util.LongMessageUtil;
 import com.enorbus.sms.gw.cmpp.util.MessageConst;
 import com.enorbus.sms.gw.cmpp.util.WapPushEncode;
 
 public class MtMessgageConsumer {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	/** MT下发线程池 */
-	private TaskExecutor taskExecutor;
 	
     private Config config = Config.getInstance();
     
     private MessageDao messageDao;
-	
+    
+	/** MT下发线程池 */
+    private ExecutorService threadPool;
 
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		this.taskExecutor = taskExecutor;
+	public ExecutorService getThreadPool() {
+		return threadPool;
 	}
 
-	public TaskExecutor getTaskExecutor() {
-		return taskExecutor;
+	public void setThreadPool(ExecutorService threadPool) {
+		this.threadPool = threadPool;
 	}
 
 	public void setMessageDao(MessageDao messageDao) {
@@ -232,5 +234,19 @@ public class MtMessgageConsumer {
 			sm.setMoMsgId((String) moMsgId);
 			subMessage.add(sm);
 		}
+		
+		send(subMessage);
+	}
+	
+	private void send(List<SubmitMessage> msgs) {
+		if (msgs.size() != 0){
+        	for(SubmitMessage msg : msgs){
+        		IoSession session = SessionManager.getInstance().findFreeSession();
+        		SubmitTask task = new SubmitTask(session, msg);
+        		
+        		SessionManager.getInstance().wait(session, msg.getHeader(), task);
+        		threadPool.execute(task);
+        	}
+        }
 	}
 }
