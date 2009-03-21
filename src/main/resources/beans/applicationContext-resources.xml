@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
     <context:property-placeholder location="classpath:jdbc.properties"/>
 
@@ -16,11 +16,8 @@
         <property name="prototypeCount" value="5"/>
         <property name="maximumConnectionCount" value="20"/>
         <property name="minimumConnectionCount" value="10"/>
-<!--        <property name="prototypeCount" value="1"/>
-        <property name="maximumConnectionCount" value="5"/>
-        <property name="minimumConnectionCount" value="1"/>-->
-        <!--<property name="trace" value="true"/>-->
-        <!--<property name="verbose" value="true"/>-->
+        <property name="trace" value="false"/>
+        <property name="verbose" value="false"/>
     </bean>
 
     <bean id="dataSourceFacede" class="org.logicalcobwebs.proxool.ProxoolFacade" destroy-method="shutdown"/>    

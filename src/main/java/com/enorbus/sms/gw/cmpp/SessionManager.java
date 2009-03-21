@@ -1,18 +1,20 @@
 package com.enorbus.sms.gw.cmpp;
 
+import java.util.Hashtable;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
+
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.util.ConcurrentHashSet;
+
 import com.enorbus.sms.gw.cmpp.message.MessageHeader;
 import com.enorbus.sms.gw.cmpp.support.Config;
-import org.apache.mina.core.session.IoSession;
-
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.concurrent.Semaphore;
 
 /**
  * session管理
  *
  * @author shiwang
- * @version $Id: SessionManager.java 2205 2009-03-03 10:00:41Z zhi.long $
+ * @version $Id: SessionManager.java 2296 2009-03-16 10:11:50Z shishuo.wang $
  */
 public class SessionManager {
 	public static final String WAITING_FOR_RESP = "waiting_for_response";
@@ -37,13 +39,14 @@ public class SessionManager {
         return sessions.toArray();
 	}
 
-    private Vector<IoSession> sessions = new Vector<IoSession>();
+    private Set<IoSession> sessions = new ConcurrentHashSet<IoSession>();
+    
 	
 	/**
 	 * 向管理器注册一个session
 	 * @param session
 	 */
-	public synchronized void register( IoSession session ) {
+	public void register( IoSession session ) {
         if (sessions.contains(session))
 			return;
 
@@ -58,14 +61,14 @@ public class SessionManager {
 	 * 注销一个session
 	 * @param session
 	 */
-	public synchronized void cancel( IoSession session ) {
+	public void cancel( IoSession session ) {
 		sessions.remove(session);
 	}
 	
 	/**
 	 * 取得一个滑动窗口流量未达到上限的session
 	 */
-	public synchronized IoSession findFreeSession() {
+	public IoSession findFreeSession() {
         Semaphore sem = null;
 
         while (true) {

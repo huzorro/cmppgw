@@ -1,11 +1,14 @@
 package com.enorbus.sms.gw.cmpp.processor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.mina.core.session.IoSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.jms.listener.AbstractJmsListeningContainer;
 
 import com.enorbus.sms.gw.cmpp.Constants;
 import com.enorbus.sms.gw.cmpp.SessionManager;
@@ -13,13 +16,12 @@ import com.enorbus.sms.gw.cmpp.dao.MessageDao;
 import com.enorbus.sms.gw.cmpp.handler.ActiveTestRequest;
 import com.enorbus.sms.gw.cmpp.handler.CancelRequest;
 import com.enorbus.sms.gw.cmpp.handler.QueryRequest;
+import com.enorbus.sms.gw.cmpp.handler.SubmitTask;
 import com.enorbus.sms.gw.cmpp.message.ActiveTestRespMessage;
 import com.enorbus.sms.gw.cmpp.message.CancelRespMessage;
 import com.enorbus.sms.gw.cmpp.message.QueryRespMessage;
 import com.enorbus.sms.gw.cmpp.message.SubmitMessage;
 import com.enorbus.sms.gw.cmpp.message.SubmitRespMessage;
-import com.enorbus.sms.gw.cmpp.mq.MtLogMessage;
-import com.enorbus.sms.gw.cmpp.task.SubmitTask;
 
 /**
  * MT-ONLY登录模式
@@ -28,37 +30,51 @@ import com.enorbus.sms.gw.cmpp.task.SubmitTask;
  * @version $Id: MtProcessorImpl.java 2242 2009-03-05 20:29:00Z shishuo.wang $
  */
 public class MtProcessorImpl extends AbstractPocessor {
-//    private Submitter submitter = new Submitter();
+	
     private SessionManager sessionManager = SessionManager.getInstance();
 	private MessageDao messageDao;
+	
+	/** MT消息监听器 */
+	private AbstractJmsListeningContainer mtListenerContainer;
+	
+	/** 指示MT消息监听器是否已启动 */
+	private AtomicBoolean started = new AtomicBoolean(false);
     
+	@Autowired
+	public void setMtListenerContainer(AbstractJmsListeningContainer mtListenerContainer) {
+		this.mtListenerContainer = mtListenerContainer;
+	}
+
+	public AbstractJmsListeningContainer getMtListenerContainer() {
+		return mtListenerContainer;
+	}
+
 	@Required
 	public void setMessageDao(MessageDao messageDao) {
 		this.messageDao = messageDao;
 	}
 
-/*    private synchronized void startSubmitter() {
-        if (!submitter.isAlive()) {
-            submitter.start();
+    private void startMtListenerContainer() {
+        if (!started.getAndSet(true) && !mtListenerContainer.isRunning()) {
+        	mtListenerContainer.start();
         }
     }
 
-    private synchronized void stopSubmitter() {
-        // 只有
-        if (submitter.isAlive()) {
-            submitter.shutdown();
+    private void stopMtListenerContainer() {
+        if (started.getAndSet(false) && mtListenerContainer.isRunning()) {
+        	mtListenerContainer.stop();
         }
-    }*/
+    }
 
     protected void onLoginSuccessfully() {
         // 如果下发线程未启动，则启动之
-//        startSubmitter();
+    	startMtListenerContainer();
     }
 
-/*    public boolean doLogout() {
-        stopSubmitter();
+    public boolean doLogout() {
+    	stopMtListenerContainer();
         return super.doLogout();
-    }*/
+    }
 
     public void onDeliver(IoSession session, Object message) {
         String msg = "onDeliver method isn't supported for MT-ONLY login mode";
@@ -86,7 +102,7 @@ public class MtProcessorImpl extends AbstractPocessor {
     }
 
     public void onKeepAliveResp(IoSession session, Object message) {
-        logger.debug("received CMPP_ACTIVE_TEST_RESP message");
+        logger.debug("On CMPP_ACTIVE_TEST_RESP message");
         ActiveTestRequest actTestReq = (ActiveTestRequest) SessionManager.getInstance().
                 complete(session, ((ActiveTestRespMessage) message).getHeader());
         if (actTestReq != null)
@@ -95,7 +111,7 @@ public class MtProcessorImpl extends AbstractPocessor {
 
     public void onSubmitResp(IoSession session, Object message) {
         //下发返回值
-        logger.debug("submit CMD_CMPP_SUBMIT_RESP message");
+        logger.debug("On CMD_CMPP_SUBMIT_RESP message");
 
         SubmitTask task = (SubmitTask) SessionManager.getInstance().
                 complete(session, ((SubmitRespMessage) message).getHeader());
@@ -108,13 +124,13 @@ public class MtProcessorImpl extends AbstractPocessor {
 
             if (msg.getPkTotal() == msg.getPkNumber()) {
                 String[] toNumber = msg.getDestTerminalId().split(Constants.TERMINAL_ID_SPLITTER);
-                boolean noFeeNumber = StringUtils.isEmpty(msg.getFeeTerminalId());
+//                boolean noFeeNumber = StringUtils.isEmpty(msg.getFeeTerminalId());
         		String msgIdPrev = msg.getMsgIdStr().substring(0, 15);
         		int msgIdSeq = Integer.parseInt(msg.getMsgIdStr().substring(15));
         		
             	for (int i=0; i<toNumber.length; i++) {
-            		if (noFeeNumber)
-            			msg.setFeeTerminalId(toNumber[i]);
+//            		if (noFeeNumber)
+//            			msg.setFeeTerminalId(toNumber[i]);
             		int tmpMsgIdSeq = msgIdSeq + i;
             		if (tmpMsgIdSeq > 0x0000FFFF)
             			tmpMsgIdSeq -= 0x00010000;
@@ -137,18 +153,18 @@ public class MtProcessorImpl extends AbstractPocessor {
         }        
     }
 
-/*    public void onLogout(IoSession session, Object message) {
+    public void onLogout(IoSession session, Object message) {
         // 如果已没有MT-ONLY login mode Session，则关闭Submitter线程
         if (sessions.size() == 0)
-            stopSubmitter();
+        	stopMtListenerContainer();
         super.onLogout(session, message);
     }
 
     public void onSessionClosed(IoSession session) {
         super.onSessionClosed(session);
         if (sessions.size() == 0)
-            stopSubmitter();
-    }*/
+        	stopMtListenerContainer();
+    }
 
     public void registerSession(IoSession session) {
         super.registerSession(session);
@@ -162,7 +178,6 @@ public class MtProcessorImpl extends AbstractPocessor {
 
     protected byte getLoginMode() {
         return Constants.MT_ONLY_LOGIN_MODE;
-//        return Constants.BOTH_LOGIN_MODE;
     }
     
     public QueryRespMessage doQuery(String time, String queryCode) {

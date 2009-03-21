@@ -1,5 +1,7 @@
 package com.enorbus.sms.gw.cmpp.handler;
 
+import java.util.concurrent.Future;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +15,7 @@ import com.enorbus.sms.gw.cmpp.support.Config;
  * 子类只需实现request()方法，进行实际发送请求的动作即可。
  * 
  * @author shiwang
- * @version $Id: RequestThread.java 2035 2009-02-10 09:09:42Z shishuo.wang $
+ * @version $Id: RequestThread.java 2294 2009-03-16 03:54:13Z shishuo.wang $
  */
 public abstract class RequestThread extends Thread {
 	
@@ -22,6 +24,8 @@ public abstract class RequestThread extends Thread {
 	private Boolean stop = false;
 	
 	protected boolean unlimitedRetry = false;
+	
+	private Future future;
 	
 	private int maxRetry = Config.getInstance().getTransportMaxRetry();
 	private int timeout = Config.getInstance().getTransportTimeout();
@@ -32,6 +36,10 @@ public abstract class RequestThread extends Thread {
 
 	protected void setTimeout(int timeout) {
 		this.timeout = timeout;
+	}
+	
+	public void setFuture(Future future) {
+		this.future = future;
 	}
 
 	public void run() {
@@ -59,9 +67,13 @@ public abstract class RequestThread extends Thread {
 			if (!stop) {
 				this.stop = true;
 		        interrupt();
+		        if (future != null)
+		        	future.cancel(true);
 				return true;
 			}
 	        interrupt();
+	        if (future != null)
+	        	future.cancel(true);
 			return false;
 		}
     }

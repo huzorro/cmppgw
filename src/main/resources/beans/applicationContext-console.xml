@@ -8,8 +8,8 @@
     </bean>
 
     <bean id="proxy" class="org.springframework.jmx.access.MBeanProxyFactoryBean">
-        <property name="objectName" value="cmppgw:name=cmppClient"/>
-        <property name="proxyInterface" value="com.enorbus.sms.gw.cmpp.Manageable"/>
+        <property name="objectName" value="cmppgw:name=client"/>
+        <property name="proxyInterface" value="com.enorbus.sms.gw.cmpp.Service"/>
         <property name="server" ref="clientConnector"/>
     </bean>
 </beans>

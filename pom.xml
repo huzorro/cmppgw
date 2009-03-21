@@ -4,7 +4,7 @@
     <groupId>com.enorbus.sms</groupId>
     <artifactId>cmppgw</artifactId>
     <name>China Mobile ISMG Client</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <description>China Mobile ISMG Client</description>
     <dependencies>
         <dependency>
@@ -109,6 +109,18 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <excludes>
+                        <exclude>beans/**</exclude>
+                        <exclude>sqlmaps/**</exclude>                        
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.properties</exclude>                        
+                    </excludes>
+                </configuration>
+            </plugin>        
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2-beta-2</version>
                 <dependencies>
@@ -145,6 +157,23 @@
                 </configuration>
             </plugin>
         </plugins>
+        
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/applicationContext-resources.xml</exclude>
+                </excludes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/applicationContext-resources.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
     </build>
     
     <properties>
@@ -152,31 +181,32 @@
     </properties>
     
     <profiles>
-	    <profile>
-	      <id>prod</id>
-	      <activation>
-	        <property>
-	          <name>environment.type</name>
-	          <value>prod</value>
-	        </property>
-	      </activation>     
-	      <build>
-	      	<resources>
-	      		<resource>
-	      			<directory>src/main/resources</directory>
-	      			<excludes>
-	      				<exclude>jdbc.properties</exclude>
-	      				<exclude>logback.xml</exclude>
-	      				<exclude>config.xml</exclude>
-	      			</excludes>
-	      			<filtering>false</filtering>
-	      		</resource>  		
-	      		<resource>
-	      			<directory>src/main/resources-prod</directory>
-	      			<filtering>false</filtering>
-	    		</resource>
-			</resources>
-		  </build>
-	    </profile>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <property>
+                    <name>environment.type</name>
+                    <value>prod</value>
+                </property>
+            </activation>
+            <build>
+                <filters>
+                    <filter>src/main/filters/prod.properties</filter>
+                </filters>
+            </build>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <property>
+                    <name>!environment.type</name>
+                </property>
+            </activation>
+            <build>
+                <filters>
+                    <filter>src/main/filters/dev.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 </project>

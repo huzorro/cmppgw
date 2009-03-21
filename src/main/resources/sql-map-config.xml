@@ -14,5 +14,5 @@
             useStatementNamespaces="false"/>
 
     <!-- Identify all SQL Map XML files to be loaded by this SQL map. Relative to classpath -->
-    <sqlMap resource="sqlmaps/MessageSQL.xml"/>
+    <sqlMap resource="sqlmaps/SQL.xml"/>
 </sqlMapConfig>

@@ -4,7 +4,7 @@ package com.enorbus.sms.gw.cmpp;
  * 常量定义
  *
  * @author <a href="mailto:zhi.long@enorbus.com.cn">Long Zhi</a>
- * @version $Id: Constants.java 2217 2009-03-05 07:50:20Z shishuo.wang $
+ * @version $Id: Constants.java 2311 2009-03-20 06:38:57Z zhi.long $
  */
 public class Constants {
     // 避免初始化常量类
@@ -82,7 +82,13 @@ public class Constants {
 
     public static final String TERMINATE_REQ_ATTR_KEY = "terminateReq";
 
+    /** 客户端主动终止标识 */
+    public static final String POSITIVE_TERMINATE_ATTR_KEY = "positiveTerminate";
+
     public static final String AUTHSOURCE_ATTR_KEY = "AuthenticatorSource";
+
+    /** Managed bean的ObjectName在Session中的属性key */
+    public static final String MBEAN_OBJECT_NAME_ATTR_KEY = "objectName";
     
     public static final String TERMINAL_ID_SPLITTER = ",";
 }

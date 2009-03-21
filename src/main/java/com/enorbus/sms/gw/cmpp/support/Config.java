@@ -69,16 +69,8 @@ public class Config {
     public int getIsmgPort() {
         return config.getInt("ismgPort");
     }
-    public String getQName() {
-        return config.getString("qName");
-    }
-    public String getGwId() {
-        return config.getString("gwId");
-    }
    
     public int getActiveTestInterval() {
-//        FileChangedReloadingStrategy strategy = (FileChangedReloadingStrategy) config.getReloadingStrategy();
-//        System.out.println(strategy.reloadingRequired());
         return config.getInt("activeTestInterval", DEF_ACTIVE_TEST_INTERVAL);
     }
 

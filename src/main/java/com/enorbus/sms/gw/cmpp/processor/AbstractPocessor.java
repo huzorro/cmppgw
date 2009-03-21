@@ -18,7 +18,7 @@ import java.util.HashSet;
  * Created by IntelliJ IDEA.
  *
  * @author Long Zhi
- * @version $Id: AbstractPocessor.java 2205 2009-03-03 10:00:41Z zhi.long $
+ * @version $Id: AbstractPocessor.java 2311 2009-03-20 06:38:57Z zhi.long $
  */
 public abstract class AbstractPocessor implements Processor {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -98,6 +98,9 @@ public abstract class AbstractPocessor implements Processor {
     }
 
     public void onLogout(IoSession session, Object message) {
+        // 标识该Session为客户端积极终止
+        session.setAttribute(Constants.POSITIVE_TERMINATE_ATTR_KEY, true);
+        
         unregisterSession(session);
         this.sessionCounter.decrease();
         TerminateResponse termResponse = new TerminateResponse(session, ((TerminateMessage) message).getHeader().getSequenceId());

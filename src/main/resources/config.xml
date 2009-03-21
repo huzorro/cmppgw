@@ -1,36 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="GBK"?>
 <config>
-    <ismgHost>127.0.0.1</ismgHost>
-    <ismgPort>7890</ismgPort>
-    <spId>909159</spId>
-    <sharedSecret>123456</sharedSecret>
+    <ismgHost>${ismgHost}</ismgHost>
+    <ismgPort>${ismgPort}</ismgPort>
+    <spId>${spId}</spId>
+    <sharedSecret>${sharedSecret}</sharedSecret>
 
-    <!-- MTè¿žæŽ¥æ•° -->
+    <!-- MTÁ¬½ÓÊý -->
     <mtConnectionNumber>1</mtConnectionNumber>
 
-    <!-- MOè¿žæŽ¥æ•° -->
+    <!-- MOÁ¬½ÓÊý -->
     <moConnectionNumber>1</moConnectionNumber>
 
-    <msgIdReverse>true</msgIdReverse>
+    <msgIdReverse>${msgIdReverse}</msgIdReverse>
 
-    <!-- æ˜¯å¦æ”¯æŒé•¿çŸ­ä¿¡åè®®ï¼Œè‹¥ä¸æ”¯æŒï¼Œåˆ™åˆ†å‰²ä¸ºå¤šæ¡è¿›è¡Œå‘é€ -->
+    <!-- ÊÇ·ñÖ§³Ö³¤¶ÌÐÅÐ­Òé£¬Èô²»Ö§³Ö£¬Ôò·Ö¸îÎª¶àÌõ½øÐÐ·¢ËÍ -->
     <supportLongMsgProtocol>false</supportLongMsgProtocol>
 
-    <!-- é“¾è·¯æµ‹è¯•é—´éš”ï¼Œäº§å“çŽ¯å¢ƒä¸­è®¾ç½®ä¸º10 -->
-    <activeTestInterval>100</activeTestInterval>
-    <!-- é“¾è·¯æµ‹è¯•è¶…æ—¶æ—¶é—´ -->
+    <!-- Á´Â·²âÊÔ¼ä¸ô£¬²úÆ·»·¾³ÖÐÉèÖÃÎª10 -->
+    <activeTestInterval>${activeTestInterval}</activeTestInterval>
+    <!-- Á´Â·²âÊÔ³¬Ê±Ê±¼ä -->
     <activeTestTimeout>60</activeTestTimeout>
-    <!-- é“¾è·¯æµ‹è¯•å¤±è´¥æœ€å¤§é‡è¯•æ¬¡æ•° -->
+    <!-- Á´Â·²âÊÔÊ§°Ü×î´óÖØÊÔ´ÎÊý -->
     <activeTestMaxRetry>3</activeTestMaxRetry>
 
-    <!-- æ¶ˆæ¯å‘é€è¶…æ—¶æ—¶é—´ -->
+    <!-- ÏûÏ¢·¢ËÍ³¬Ê±Ê±¼ä -->
     <transportTimeout>60</transportTimeout>
-    <!-- æ¶ˆæ¯å‘é€å¤±è´¥æœ€å¤§é‡è¯•æ¬¡æ•° -->
+    <!-- ÏûÏ¢·¢ËÍÊ§°Ü×î´óÖØÊÔ´ÎÊý -->
     <transportMaxRetry>3</transportMaxRetry>
 
-    <!--æ»‘åŠ¨çª—å£å¤§å°ï¼ˆæµé‡æŽ§åˆ¶ï¼‰-->
+    <!--»¬¶¯´°¿Ú´óÐ¡£¨Á÷Á¿¿ØÖÆ£©-->
     <trafficControl>16</trafficControl>
     
-    <!-- æŸ¥è¯¢çŠ¶æ€è¶…æ—¶æ—¶é—´ -->
+    <!-- ²éÑ¯×´Ì¬³¬Ê±Ê±¼ä -->
     <queryTimeout>10</queryTimeout>
 </config>
